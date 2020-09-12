@@ -1,17 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import './css/index.css';
+
+import App from './components/App';
 import * as serviceWorker from './serviceWorker';
+
+import { Provider } from "mobx-react";
+import { createRootStore } from "./stores/rootStore";
+import { onPatch } from "mobx-state-tree";
+
+const store = createRootStore;
+
+onPatch(store, (patch) => {
+  console.log(patch);
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();

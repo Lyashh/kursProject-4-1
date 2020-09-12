@@ -1,0 +1,13 @@
+.container-fluid {
+  padding: 0px!important;
+  margin: 0px!important;
+} 
+
+#home-wrap, nav {
+  padding-left: 100px!important;
+  padding-right: 100px!important;
+}
+
+nav {
+  margin-bottom: 70px;
+}
