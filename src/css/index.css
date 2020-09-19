@@ -1,13 +1,84 @@
 .container-fluid {
-  padding: 0px!important;
-  margin: 0px!important;
-} 
+  padding: 0px !important;
+  margin: 0px !important;
+}
 
-#home-wrap, nav {
-  padding-left: 100px!important;
-  padding-right: 100px!important;
+a {
+  color: inherit; /* blue colors for links too */
+  text-decoration: none; /* no underline */
+}
+
+a:hover {
+  color: #82cf8f; /* blue colors for links too */
+  text-decoration: none; /* no underline */
+}
+
+#home-wrap,
+nav {
+  padding-left: 100px !important;
+  padding-right: 100px !important;
 }
 
 nav {
-  margin-bottom: 70px;
+  margin-bottom: 100px;
+}
+
+.ReactModal__Content--after-open > h5 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.fileTitle {
+  margin-right: 30px;
+}
+
+.navbar-brand {
+  margin-right: 50px;
+}
+
+.work-wrap {
+  margin-top: 150px;
+}
+
+.m-t-17 {
+  margin-top: 17px;
+}
+
+.m-r-10 {
+  margin-right: 10px;
+}
+
+.p-r-60 {
+  padding-right: 60px;
+}
+
+.figure-wrap > .col-md-4 > h5 {
+  color: #269640;
+  margin-bottom: 30px;
+}
+
+.task {
+  text-align: center;
+}
+
+.task h4 {
+  padding: 11px;
+}
+
+.activeTask h4 {
+  background-color: #82cf8f;
+  border-radius: 30px;
+  color: #fff;
+}
+
+.activeTask h4:hover {
+  background-color: #f6b973;
+}
+
+.red-text {
+  color: rgb(223, 91, 91);
+}
+
+.orange-text {
+  color: #e0953f;
 }
