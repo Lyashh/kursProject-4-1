@@ -3,9 +3,9 @@ import { formatTextModel } from "./formatText.model";
 
 export const FileModel = types.model("FileModel", {
   name: types.string,
-  value: types.string,
+  value: types.maybeNull(types.string),
   saved: types.boolean,
-  formatText: types.maybe(types.frozen(types.array(formatTextModel))),
+  formatText: types.array(formatTextModel),
 });
 
 export type File = Instance<typeof FileModel>;

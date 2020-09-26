@@ -1,17 +1,21 @@
 import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { observer, inject } from "mobx-react";
 import { HomeState } from "../types/states";
+import { HomeProps } from "../types/props";
 import Files from "./tasks/Files";
 import Individual from "./tasks/Individual";
 import Stack from "./tasks/Stack";
+import axios from "axios";
 
-class Home extends React.Component<{}, HomeState> {
+@inject("store")
+@observer
+class Home extends React.Component<HomeProps, HomeState> {
   private tasks: any;
 
-  constructor(props: {}) {
+  constructor(props: HomeProps) {
     super(props);
     this.state = {
-      greeting: true,
       currentTusk: "files",
       stack: true,
     };
@@ -23,9 +27,10 @@ class Home extends React.Component<{}, HomeState> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    this.props.store?.fileStore.getServerFiles();
     setTimeout(() => {
-      this.setState({ greeting: false });
+      this.props.store?.setGreeting(false);
     }, 10000);
   }
 
@@ -44,7 +49,7 @@ class Home extends React.Component<{}, HomeState> {
         </p>
         <Button
           variant="primary"
-          onClick={() => this.setState({ greeting: false })}
+          onClick={() => this.props.store?.setGreeting(false)}
         >
           Закрити
         </Button>
@@ -77,7 +82,7 @@ class Home extends React.Component<{}, HomeState> {
                 " task"
               }
             >
-              <h4>Стек/черга</h4>
+              <h4>Stack / Queue</h4>
             </a>
           </Col>
           <Col
@@ -102,7 +107,7 @@ class Home extends React.Component<{}, HomeState> {
     );
     return (
       <Container fluid={true} id="home-wrap">
-        <Row>{this.state.greeting ? greeting : content}</Row>
+        <Row>{this.props.store?.greeting ? greeting : content}</Row>
       </Container>
     );
   }
