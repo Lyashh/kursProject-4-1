@@ -22,7 +22,6 @@ class Home extends React.Component<HomeProps, HomeState> {
 
     this.tasks = {
       files: <Files />,
-      individual: <Individual />,
       stack: <Stack />,
     };
   }
@@ -61,7 +60,7 @@ class Home extends React.Component<HomeProps, HomeState> {
     const content = (
       <Col md={9} className="mx-auto">
         <Row>
-          <Col md={4}>
+          <Col md={6}>
             <a
               href="#"
               onClick={() => this.setState({ currentTusk: "files" })}
@@ -73,7 +72,7 @@ class Home extends React.Component<HomeProps, HomeState> {
               <h4>In/Out of data</h4>
             </a>
           </Col>
-          <Col md={4}>
+          <Col md={6}>
             <a
               href="#"
               onClick={() => this.setState({ currentTusk: "stack" })}
@@ -85,20 +84,7 @@ class Home extends React.Component<HomeProps, HomeState> {
               <h4>Stack / Queue</h4>
             </a>
           </Col>
-          <Col
-            md={4}
-            onClick={() => this.setState({ currentTusk: "individual" })}
-          >
-            <a
-              href="#"
-              className={
-                (this.state.currentTusk == "individual" ? "activeTask" : "") +
-                " task"
-              }
-            >
-              <h4>Individual Task</h4>
-            </a>
-          </Col>
+
           <Col md={12} className="work-wrap">
             {task}
           </Col>

@@ -9,9 +9,13 @@ import {
   FormControl,
 } from "react-bootstrap";
 import { IndividualState } from "../../types/states/index";
+import { IndividualTaskProps } from "../../types/props/index";
 
-class IndividualTask extends React.Component<{}, IndividualState> {
-  constructor(props: any) {
+class IndividualTask extends React.Component<
+  IndividualTaskProps,
+  IndividualState
+> {
+  constructor(props: IndividualTaskProps) {
     super(props);
     this.state = {
       figures: ["triangle", "rhombus", "circle"],
@@ -44,7 +48,25 @@ class IndividualTask extends React.Component<{}, IndividualState> {
     };
   }
 
+  clearAllFields = () => {
+    this.setState({
+      triangle: {
+        a: { value: 0, err: true },
+        b: { value: 0, err: true },
+        c: { value: 0, err: true },
+      },
+      rhombus: {
+        d1: { value: 0, err: true },
+        d2: { value: 0, err: true },
+      },
+      circle: {
+        r: { value: 0, err: true },
+      },
+    });
+  };
+
   handleFigure = (e: any) => {
+    this.props.updateTimer();
     this.setState({ figure: e.target.value });
   };
 
@@ -56,6 +78,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
   };
 
   handleTriangleSides = (e: any) => {
+    this.props.updateTimer();
     let trSides = this.state.triangle;
     let side = e.target.name as "a" | "b" | "c";
     trSides[side].value = e.target.value;
@@ -74,6 +97,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
   };
 
   handleRhombusSides = (e: any) => {
+    this.props.updateTimer();
     let rbSides = this.state.rhombus;
     let side = e.target.name as "d1" | "d2";
     rbSides[side].value = e.target.value;
@@ -90,6 +114,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
   };
 
   handleCircleSides = (e: any) => {
+    this.props.updateTimer();
     const crSides = this.state.circle;
     let side = e.target.name as "r";
     crSides[side].value = e.target.value;
@@ -110,7 +135,9 @@ class IndividualTask extends React.Component<{}, IndividualState> {
     if (this.checkCircle()) {
       const r = Number(circle.r.value);
       const area = Number((Math.PI * (r * r)).toFixed(2));
-      this.setState({ circleArea: area });
+      this.setState({ circleArea: area }, () => {
+        this.props.sendResult("circle", r, 0, 0, area);
+      });
     } else {
       this.setState({ circleArea: null });
     }
@@ -131,7 +158,9 @@ class IndividualTask extends React.Component<{}, IndividualState> {
       const d2 = Number(rhombus.d2.value);
 
       const area = Number(((d1 * d2) / 2).toFixed(2));
-      this.setState({ rhombusArea: area });
+      this.setState({ rhombusArea: area }, () => {
+        this.props.sendResult("rhombus", d1, d2, 0, area);
+      });
     } else {
       this.setState({ rhombusArea: null });
     }
@@ -161,7 +190,9 @@ class IndividualTask extends React.Component<{}, IndividualState> {
       const area = Number(
         Math.sqrt(p * (p - a) * (p - b) * (p - c)).toFixed(2)
       );
-      this.setState({ triangleArea: area });
+      this.setState({ triangleArea: area }, () => {
+        this.props.sendResult("triangle", a, b, c, area);
+      });
     } else {
       this.setState({ triangleArea: null });
     }
@@ -190,6 +221,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
 
   render() {
     const { figure, rhombus, triangle, circle } = this.state;
+    const on = this.props.active;
 
     const triangleArea = this.checkTriangleValidation() ? (
       <span className="orange-text">{this.state.triangleArea}</span>
@@ -216,7 +248,10 @@ class IndividualTask extends React.Component<{}, IndividualState> {
             <InputGroup className="mb-3 m-t-17" key={i}>
               <Form.Label className="m-r-10">Side {side}:</Form.Label>
               <FormControl
-                className={this.state.triangle[side].err ? "is-invalid" : ""}
+                disabled={on}
+                className={
+                  this.state.triangle[side].err && !on ? "is-invalid" : ""
+                }
                 key={i}
                 name={side}
                 placeholder={`Enter side ${side}`}
@@ -224,6 +259,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
                 type="text"
                 value={this.state.triangle[side].value}
                 onChange={(e: any) => this.handleTriangleSides(e)}
+                autoComplete="off"
               />
             </InputGroup>
           );
@@ -238,13 +274,17 @@ class IndividualTask extends React.Component<{}, IndividualState> {
             <InputGroup className="mb-3 m-t-17" key={side}>
               <Form.Label className="m-r-10">diagonale {side}:</Form.Label>
               <FormControl
-                className={this.state.rhombus[side].err ? "is-invalid" : ""}
+                disabled={on}
+                className={
+                  this.state.rhombus[side].err && !on ? "is-invalid" : ""
+                }
                 name={side}
                 placeholder={`Enter diagonale ${side}`}
                 aria-label={side}
                 type="text"
                 value={this.state.rhombus[side].value}
                 onChange={(e: any) => this.handleRhombusSides(e)}
+                autoComplete="off"
               />
             </InputGroup>
           );
@@ -259,13 +299,17 @@ class IndividualTask extends React.Component<{}, IndividualState> {
             <InputGroup className="mb-3 m-t-17" key={side}>
               <Form.Label className="m-r-10">radius {side}:</Form.Label>
               <FormControl
-                className={this.state.circle[side].err ? "is-invalid" : ""}
+                disabled={on}
+                className={
+                  this.state.circle[side].err && !on ? "is-invalid" : ""
+                }
                 name={side}
                 placeholder={`Enter radius ${side}`}
                 aria-label={side}
                 type="text"
                 value={this.state.circle[side].value}
                 onChange={(e: any) => this.handleCircleSides(e)}
+                autoComplete="off"
               />
             </InputGroup>
           );
@@ -276,6 +320,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
     const radioInputs = this.state.figures.map((f, i) => {
       return (
         <Form.Check
+          disabled={on}
           className="m-t-17"
           key={i}
           type="radio"
@@ -302,7 +347,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
         : circleArea;
 
     return (
-      <Row className="task-wrap">
+      <Row className="task-wrap p-l-100">
         <Col md={4} className="p-r-60">
           <h5>Choose a figure:</h5>
           <Form>{radioInputs}</Form>
@@ -314,7 +359,7 @@ class IndividualTask extends React.Component<{}, IndividualState> {
         </Col>
         <Col md={4} className="p-r-60">
           <h5>
-            {figure} area: {figureArea}
+            {figure} area: {on ? figureArea : null}
           </h5>
         </Col>
       </Row>

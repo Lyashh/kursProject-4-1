@@ -29,6 +29,10 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
       modalWrongFormat: false,
       fileName: null,
       fileValue: null,
+      search: "",
+      searchIndex: 0,
+      searchHide: true,
+      searchResults: [],
     };
   }
 
@@ -46,7 +50,11 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
     e.preventDefault();
 
     // Check file on txt format
-    if (e.target.files[0].type !== "text/plain") {
+
+    if (
+      e.target.files[0].type !== "text/plain" &&
+      e.target.files[0].type !== "application/vnd.ms-excel"
+    ) {
       this!.fileInput!.current!.value = "";
       this.setState({
         modalWrongFormat: true,
@@ -55,6 +63,7 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
       });
       return;
     }
+    const type = e.target.files[0].type;
 
     // Read file
     const reader = new FileReader();
@@ -71,11 +80,12 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
         //ADD
 
         const fileExist = false;
-        if (!fileExist) {
+        if (!fileExist && type) {
           // Creating new file
           this.props.store!.fileStore.createFile(
             this.state!.fileName!,
-            this.state!.fileValue!
+            this.state!.fileValue!,
+            type
           );
           return;
         }
@@ -102,37 +112,82 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
     };
   };
 
+  getDataFromServer = async (name: string) => {
+    name = name.replaceAll(".txt", "");
+    await this.props.store!.fileStore.getDataFromServerFile(name);
+  };
+
+  handleSearch = (e: any) => {
+    this.setState(
+      {
+        search: e.target.value,
+        searchIndex: this.state.searchIndex + 1,
+        searchHide: false,
+      },
+      () => {
+        this.startTimerOnModal();
+      }
+    );
+  };
+
+  startTimerOnModal = () => {
+    const timerId = this.state.searchIndex;
+    setTimeout(() => {
+      if (!this.state.searchHide && timerId === this.state.searchIndex) {
+        this.setState({ searchHide: true });
+      }
+    }, 7000);
+  };
+
   render() {
     const file = this.props.store!.fileStore.file;
     const currenFile = file ? file.name + ".txt" : "No file";
+
+    const searchResults = file
+      ? this.props.store?.fileStore.getSeachData(this.state.search)
+      : null;
+
     const searchForm = file ? (
-      <Form inline>
-        <FormControl type="text" placeholder="Search" className="mr-sm-2" />
+      <Form inline className="seach-input">
+        <FormControl
+          type="text"
+          placeholder="Search"
+          className="mr-sm-2"
+          onChange={(e) => this.handleSearch(e)}
+          value={this.state.search}
+        />
+        {this.state.searchHide ? null : (
+          <div className="seach-wrap">
+            {searchResults!.length > 0 ? (
+              searchResults!.map((el, i) => {
+                return (
+                  <div key={el + i}>
+                    <p>
+                      {++i}) ID: {el.id}. Result: {el.value}
+                    </p>
+                    <p>source: {el.source}</p>
+                  </div>
+                );
+              })
+            ) : (
+              <div>
+                <p>No Results</p>
+              </div>
+            )}
+          </div>
+        )}
       </Form>
     ) : null;
 
     return (
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-        <Modal isOpen={this.state.modalWarningOpen} style={modalStyle}>
-          <h5>
-            Файл з таким ім'ям вже збережено в програмі. Ви можете перезаписати
-            файл чи скористатися існуючим
-          </h5>
-          <Button onClick={() => this.continueNew()}>
-            Замінити та продовжити
-          </Button>
-          <Button onClick={() => this.continueOld()}>
-            Продовжити роботу з існуючим
-          </Button>
-        </Modal>
-
         <Modal isOpen={this.state.modalWrongFormat} style={modalStyle}>
-          <h5>Невірний формат файлу</h5>
+          <h5>Wrong file format</h5>
           <Button
             variant="danger"
             onClick={() => this.setState({ modalWrongFormat: false })}
           >
-            Закрити
+            Close
           </Button>
         </Modal>
 
@@ -145,13 +200,13 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
             <Link to="about" className="nav-link" role="button">
               About
             </Link>
-            <NavDropdown title="Робота за файлом" id="collasible-nav-dropdown">
-              <NavDropdown.Item>Новий</NavDropdown.Item>
+            <NavDropdown title="File" id="collasible-nav-dropdown">
+              <NavDropdown.Item>New file</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="#action/3.2">
-                <span style={{ marginRight: "10px" }}>Відкрити</span>
+                <span style={{ marginRight: "10px" }}>Open</span>
                 <input
-                  accept=".txt"
+                  accept=".txt,.csv"
                   type="file"
                   id="file"
                   ref={this.fileInput}
@@ -159,12 +214,33 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
                 />
               </NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action">
-                Зберегти як .txt
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action">
-                Зберегти як .cvc
-              </NavDropdown.Item>
+              {this.props.store!.fileStore!.file ? (
+                <>
+                  <a
+                    target="_blank"
+                    type="application/octet-stream"
+                    className="dropdown-item"
+                    href={`http://localhost:8080/download/${
+                      this.props.store!.fileStore!.file.name
+                    }`}
+                    download="FileName"
+                  >
+                    Save as .txt
+                  </a>
+
+                  <a
+                    target="_blank"
+                    type="application/octet-stream"
+                    className="dropdown-item"
+                    href={`http://localhost:8080/download-csv/${
+                      this.props.store!.fileStore!.file.name
+                    }`}
+                    download="FileName"
+                  >
+                    Save as .cvc
+                  </a>
+                </>
+              ) : null}
             </NavDropdown>
             {this.props.store!.fileStore!.serverFiles!.length > 0 ? (
               <NavDropdown
@@ -173,7 +249,14 @@ class NavbarComponent extends React.Component<NavbarProps, NavbarState> {
                 className="m-l-30"
               >
                 {this.props.store!.fileStore!.serverFiles.map((el, i) => {
-                  return <NavDropdown.Item key={el + i}>{el}</NavDropdown.Item>;
+                  return (
+                    <NavDropdown.Item
+                      key={el + i}
+                      onClick={() => this.getDataFromServer(el)}
+                    >
+                      {el}
+                    </NavDropdown.Item>
+                  );
                 })}
               </NavDropdown>
             ) : (

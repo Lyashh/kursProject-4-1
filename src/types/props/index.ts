@@ -11,3 +11,9 @@ export interface FilesTaskProps {
 export interface HomeProps {
   store?: Root;
 }
+
+export interface IndividualTaskProps {
+  active: boolean;
+  updateTimer: any;
+  sendResult: any;
+}

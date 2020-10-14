@@ -8,6 +8,10 @@ export interface NavbarState {
   modalWrongFormat: boolean;
   fileName?: string | null;
   fileValue?: string | null;
+  search: string;
+  searchIndex: number;
+  searchHide: boolean;
+  searchResults: Array<any>;
 }
 
 export interface IndividualState {
@@ -53,7 +57,13 @@ export interface StackQueueState {
 }
 
 export interface FileTaskState {
-  value: string;
+  value: null | {
+    type: string;
+    side_a: number;
+    side_b: number;
+    side_c: number;
+    value: number;
+  };
   on: boolean;
   result: string;
   timerId: number;

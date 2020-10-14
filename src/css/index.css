@@ -62,12 +62,20 @@ nav {
   margin-right: 10px;
 }
 
+.m-b-40 {
+  margin-bottom: 40px;
+}
+
 .m-l-30 {
   margin-left: 30px;
 }
 
 .p-r-60 {
   padding-right: 60px;
+}
+
+.p-l-100 {
+  padding-left: 100px;
 }
 
 .task-wrap h5,
@@ -88,7 +96,6 @@ nav {
 }
 
 .file-task-wrap .input-group {
-  width: 300px;
   text-align: right;
 }
 
@@ -180,4 +187,25 @@ nav {
   height: 45px;
   font-size: 19px;
   border-radius: 50px;
+}
+
+.seach-wrap {
+  padding: 10px;
+  position: absolute;
+  background-color: #82cf8f;
+  width: 97%;
+  top: 40px;
+  border-radius: 5px;
+}
+
+.seach-wrap p {
+  margin: 0px !important;
+  padding: 0px !important;
+  color: #fff;
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.seach-input {
+  position: relative;
 }
